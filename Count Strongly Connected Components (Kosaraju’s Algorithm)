@@ -1,0 +1,66 @@
+#include<stack>
+
+void topoDfs(int root, vector<int> adj[], stack<int> &order, vector<int> &vis)
+{
+    vis[root] = 1 ;
+    for(auto &nbr: adj[root])
+    {
+        if(vis[nbr] == 0)
+            topoDfs(nbr , adj , order , vis) ;
+    }
+    order.push(root) ;
+}
+
+void dfs(int root,  vector<int> adj[] , vector<int> &vis )
+{
+    vis[root] = 1 ;
+    for(auto &nbr: adj[root])
+    {
+        if(vis[nbr] == 0)
+            dfs(nbr , adj , vis) ;
+    }
+}
+
+int stronglyConnectedComponents(int v, vector<vector<int>> &edges)
+{
+	// Step 1 - TOPO SORT using stack
+    stack<int> order ;
+    vector<int> vis(v , 0) ;
+    vector<int> adj[v] ;
+    for(auto &edge : edges)
+    {
+        adj[edge[0]].push_back(edge[1]) ;
+    }
+    for(int i=0; i<v; i++)
+    {
+        if(vis[i] == 0)
+        {
+            topoDfs(i , adj , order, vis) ; 
+        }
+    }
+    
+    // Step 2 - create reverse graph
+    vector<int> revAdj[v] ;
+    for(auto &edge : edges)
+    {
+        revAdj[edge[1]].push_back(edge[0]) ;
+    }
+    
+    // Count Strongly Connected Components by popping elements from stack
+     for(int i=0; i<v; i++)
+        vis[i] = 0 ;
+    
+     int count = 0 ;
+     while(order.size() > 0)
+     {
+         int top = order.top();
+         order.pop();
+         
+         if(vis[top]) continue;
+         else
+            dfs(top , revAdj , vis) , count++ ;
+ 
+     }
+    
+     return count ;
+}
